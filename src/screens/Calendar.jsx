@@ -1,67 +1,59 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 function Calendar() {
-  const date = new Date();
-  const dayWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const todayYear = date.getFullYear();
-  const todayMonth = date.getMonth();
-  const month = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "Jun",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  const todayMonthString = month[todayMonth];
-  const firstWeekIndex = new Date(todayYear, todayMonth, 1).getDay();
-  let dateCount = 0 - firstWeekIndex;
+  const [month, setMonth] = useState(() => new Date().getMonth());
+  const dayWeekArray = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const today = new Date();
+  const monthString = new Date(today.getFullYear(), month, today.getDate()).toLocaleString("en-US", { month: "long" });
+  const year = new Date(today.getFullYear(), month, today.getDate()).getFullYear();
 
-  const dayilyMatrix = Array.from(Array(5)).map(() => {
-    return Array.from(Array(7)).map(() => {
+  const firstDayWeekIndex = new Date(today.getFullYear(), month, 1).getDay();
+  let dateCount = 0 - firstDayWeekIndex;
+  const dayilyMatrix = new Array(6).fill([]).map(() => {
+    return new Array(7).fill(0).map(() => {
       dateCount++;
-      return new Date(todayYear, todayMonth, dateCount).getDate();
+      return new Date(today.getFullYear(), month, dateCount).getDate();
     });
   });
 
   return (
     <View style={styles.container}>
-      <Text>
-        <Icon.Button
-          name="angle-left"
-          color="#2196F3"
-          backgroundColor="#00000000"
-        />
-        {todayMonthString} {todayYear}
-        <Icon.Button
-          name="angle-right"
-          color="#2196F3"
-          backgroundColor="#00000000"
-        />
-      </Text>
+      <View>
+        <Text>
+          <Icon.Button
+            name="angle-left"
+            color="#2196F3"
+            backgroundColor="#00000000"
+            onPress={() => setMonth(month - 1)}
+          />
+          {monthString} {year}
+          <Icon.Button
+            name="angle-right"
+            color="#2196F3"
+            backgroundColor="#00000000"
+            onPress={() => setMonth(month + 1)}
+          />
+        </Text>
+      </View>
       <View>
         <View>
-          <Text>{dayWeek}</Text>
+          <Text>{dayWeekArray}</Text>
         </View>
-        {dayilyMatrix.map((week, weekIndex) => (
-          <View key={weekIndex}>
-            <Text>{week}</Text>
-          </View>
-        ))}
+        <View>
+          {dayilyMatrix.map((weekList, weekIndex) => (
+            <Text key={weekIndex}>
+              {weekList.map((day, dayIndex) => (
+                <Text key={dayIndex}>{day}</Text>
+              ))}
+            </Text>
+          ))}
+        </View>
       </View>
     </View>
   );
 }
-
-export default Calendar;
 
 const styles = StyleSheet.create({
   container: {
@@ -70,3 +62,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+
+export default Calendar;
