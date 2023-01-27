@@ -1,17 +1,9 @@
-import React from 'react';
-import { SafeAreaView,Text,View } from 'react-native';
+import React from "react";
+
+import BottomTabs from "./src/tabs/BottomTabs";
 
 function App() {
-
-  return (
-    <SafeAreaView>
-        <View>
-          <Text>
-            Calendar
-          </Text>
-        </View>
-    </SafeAreaView>
-  );
+  return <BottomTabs />
 }
 
 export default App;
