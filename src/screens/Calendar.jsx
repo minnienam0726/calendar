@@ -22,7 +22,7 @@ function Calendar() {
 
   return (
     <View style={styles.container}>
-      <View>
+      <View style={styles.topContainer}>
         <Icon.Button
           name="angle-left"
           color="#35C0F5"
@@ -30,7 +30,7 @@ function Calendar() {
           backgroundColor="#00000000"
           onPress={() => setMonth(month - 1)}
         />
-        <Text>
+        <Text style={styles.monthYearText}>
           {monthString} {year}
         </Text>
         <Icon.Button
@@ -41,29 +41,31 @@ function Calendar() {
           onPress={() => setMonth(month + 1)}
         />
       </View>
-      <View>
-        <View>
+      <View style={styles.bottomContainer}>
+        <View style={styles.dayWeekContainer}>
           {dayWeekArray.map((dayWeek, dayWeekIndex) => (
-            <Text key={dayWeekIndex}>
+            <Text style={styles.dayWeekText} key={dayWeekIndex}>
               {dayWeek}
             </Text>
           ))}
         </View>
-        {dayilyMatrix.map((weekList, weekIndex) => (
-          <Text key={weekIndex}>
-            {weekList.map((day, dayIndex) => (
-              <TouchableOpacity
-                key={dayIndex}
-                style={pressedButton.toString() === weekList[dayIndex].toString() ? styles.radiusEffect : styles.normal}
-                onPress={() => setPressedButton(day)}
-              >
-                <Text>
-                  {day.getDate()}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </Text>
-        ))}
+        <View style={styles.monthContainer}>
+          {dayilyMatrix.map((weekList, weekIndex) => (
+            <View style={styles.weekContainer} key={weekIndex}>
+              {weekList.map((day, dayIndex) => (
+                <TouchableOpacity
+                  key={dayIndex}
+                  style={pressedButton.toString() === weekList[dayIndex].toString() ? styles.radiusEffect : styles.nonRadiusEffect}
+                  onPress={() => setPressedButton(day)}
+                >
+                  <Text style={styles.dayText}>
+                    {day.getDate()}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
+        </View>
       </View>
     </View>
   );
@@ -72,8 +74,51 @@ function Calendar() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    backgroundColor: "#ffffff",
+  },
+  topContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
     alignItems: "center",
+    marginVertical: 5,
+  },
+  monthYearText: {
+    fontSize: 18,
+  },
+  bottomContainer: {
+    alignItems: "center",
+  },
+  dayWeekContainer: {
+    flexDirection: "row",
+    marginVertical: 15,
+  },
+  dayWeekText: {
+    width: 50,
+    textAlign: "center",
+  },
+  monthContainer: {
+    width: "90%",
+  },
+  weekContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  radiusEffect: {
+    justifyContent: "center",
+    width: 50,
+    height: 50,
+    borderWidth: 2,
+    borderRadius: 100,
+    borderColor: "#35C0F5",
+  },
+  nonRadiusEffect: {
+    justifyContent: "center",
+    width: 50,
+    height: 50,
+  },
+  dayText: {
+    textAlign: "center",
+    fontSize: 15
   },
 });
 
