@@ -117,8 +117,8 @@ const styles = StyleSheet.create({
     height: 50,
   },
   dayText: {
+    fontSize: 15,
     textAlign: "center",
-    fontSize: 15
   },
 });
 
