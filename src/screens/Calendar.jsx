@@ -1,10 +1,72 @@
 import { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/FontAwesome";
+
+function BottomSheet() {
+  return (
+    <View style={styles.bottomSheetContainer}>
+      <View style={styles.dragBar} />
+      <Text>
+        BottomSheet
+      </Text>
+    </View>
+  );
+}
+
+function WeekMatrix({ pressedButton, targetWeek }) {
+  return (
+    <View style={styles.oneWeekContainer}>
+      {targetWeek?.map((day, dayIndex) => (
+        <Pressable
+          style={pressedButton.toString() === day.toString()
+            ? styles.radiusEffect
+            : styles.nonRadiusEffect}
+          onPress={() => {
+            setPressedButton(day);
+          }}
+          key={dayIndex}
+        >
+          <Text  style={styles.dayText}>
+            {day.getDate()}
+          </Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+function CalendarMatrix({ pressedButton, setPressedButton, setTargetWeek, dayilyMatrix }) {
+  return (
+    <View style={styles.calendarMatrixContainer}>
+      {dayilyMatrix.map((weekList, weekIndex) => (
+        <View style={styles.weekContainer} key={weekIndex}>
+          {weekList.map((day, dayIndex) => (
+            <Pressable
+              style={pressedButton.toString() === weekList[dayIndex].toString()
+                ? styles.radiusEffect
+                : styles.nonRadiusEffect}
+              onPress={() => {
+                setPressedButton(day);
+                setTargetWeek(weekList);
+              }}
+              key={dayIndex}
+            >
+              <Text style={styles.dayText}>
+                {day.getDate()}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      ))}
+    </View>
+  );
+}
 
 function Calendar() {
   const [month, setMonth] = useState(() => new Date().getMonth());
   const [pressedButton, setPressedButton] = useState("");
+  const [targetWeek, setTargetWeek] = useState([]);
 
   const dayWeekArray = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const today = new Date();
@@ -21,8 +83,8 @@ function Calendar() {
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topContainer}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.titleContainer}>
         <Icon.Button
           name="angle-left"
           color="#35C0F5"
@@ -39,86 +101,89 @@ function Calendar() {
           size={40}
           backgroundColor="#00000000"
           onPress={() => setMonth(month + 1)}
-        />
+          />
       </View>
-      <View style={styles.bottomContainer}>
-        <View style={styles.dayWeekContainer}>
-          {dayWeekArray.map((dayWeek, dayWeekIndex) => (
-            <Text style={styles.dayWeekText} key={dayWeekIndex}>
-              {dayWeek}
-            </Text>
-          ))}
-        </View>
-        <View style={styles.monthContainer}>
-          {dayilyMatrix.map((weekList, weekIndex) => (
-            <View style={styles.weekContainer} key={weekIndex}>
-              {weekList.map((day, dayIndex) => (
-                <TouchableOpacity
-                  key={dayIndex}
-                  style={pressedButton.toString() === weekList[dayIndex].toString() ? styles.radiusEffect : styles.nonRadiusEffect}
-                  onPress={() => setPressedButton(day)}
-                >
-                  <Text style={styles.dayText}>
-                    {day.getDate()}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          ))}
-        </View>
+      <View style={styles.dayWeekContainer}>
+        {dayWeekArray.map((dayWeek, dayWeekIndex) => (
+          <Text style={styles.dayWeekText} key={dayWeekIndex}>
+            {dayWeek}
+          </Text>
+        ))}
       </View>
-    </View>
+      <CalendarMatrix
+        pressedButton={pressedButton}
+        setPressedButton={setPressedButton}
+        targetWeek={targetWeek}
+        setTargetWeek={setTargetWeek}
+        dayilyMatrix={dayilyMatrix}
+      />
+      <WeekMatrix
+        pressedButton={pressedButton}
+        targetWeek={targetWeek}
+      />
+      <BottomSheet />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff",
+    alignItems: "center",
   },
-  topContainer: {
+  titleContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-evenly",
     alignItems: "center",
     marginVertical: 5,
   },
-  monthYearText: {
-    fontSize: 18,
-  },
-  bottomContainer: {
-    alignItems: "center",
-  },
   dayWeekContainer: {
+    alignItems: "center",
     flexDirection: "row",
     marginVertical: 15,
   },
   dayWeekText: {
-    width: 50,
+    width: 45,
+    fontSize: 15,
     textAlign: "center",
   },
-  monthContainer: {
-    width: "90%",
+  calendarMatrixContainer:{
+    width: "100%",
+    backgroundColor: "yellow",
+  },
+  oneWeekContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    height: 45,
   },
   weekContainer: {
     flexDirection: "row",
     justifyContent: "center",
+    height: 45,
   },
   radiusEffect: {
     justifyContent: "center",
-    width: 50,
-    height: 50,
+    width: 45,
     borderWidth: 2,
     borderRadius: 100,
     borderColor: "#35C0F5",
   },
   nonRadiusEffect: {
     justifyContent: "center",
-    width: 50,
-    height: 50,
+    width: 45,
   },
   dayText: {
     fontSize: 15,
     textAlign: "center",
+  },
+  bottomSheetContainer: {
+    width: "100%",
+  },
+  dragBar: {
+    marginTop: 5,
+    width: "100%",
+    height: 2,
+    backgroundColor: "black",
   },
 });
 
