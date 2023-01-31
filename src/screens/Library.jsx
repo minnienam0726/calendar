@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 function Library() {
@@ -9,8 +8,6 @@ function Library() {
   );
 }
 
-export default Library;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -18,3 +15,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+
+export default Library;
