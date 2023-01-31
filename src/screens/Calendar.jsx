@@ -1,20 +1,77 @@
-import { useState } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { View, Text, StyleSheet, Dimensions, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import { Gesture, GestureDetector, GestureHandlerRootView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-function BottomSheet() {
+const WINDOW_HEIGHT = Dimensions.get("window").height;
+const END_POSITION = -340;
+
+function BottomSheet({ dragBarY, setDragBarY, setCalendarMatrixHeight }) {
+  const dragBarRef = useRef();
+  const offset = useSharedValue({ x: 0, y: 0 });
+  const start = useSharedValue({ x: 0, y: 0 });
+
+  const gesture = Gesture.Pan()
+    .onUpdate((event) => {
+      if (dragBarY > 207) {
+        offset.value = {
+          x: event.translationX + start.value.x,
+          y: event.translationY + start.value.y,
+        }
+      } else {
+        offset.value = {
+          y: END_POSITION,
+        }
+      }
+    })
+    .onEnd(() => {
+      start.value = {
+        x: offset.value.x,
+        y: offset.value.y,
+      }
+    });
+
+  function getDragBarY() {
+    dragBarRef.current?.measureInWindow((x, y) => {
+      setDragBarY(y);
+    });
+  }
+
+  const animationStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{
+        translateY: offset.value.y,
+      }],
+    };
+  });
+
   return (
-    <View style={styles.bottomSheetContainer}>
-      <View style={styles.dragBar} />
-      <Text>
-        BottomSheet
-      </Text>
-    </View>
+    <GestureDetector gesture={gesture}>
+      <Animated.View style={[
+        styles.bottomSheetContainer,
+        animationStyle
+      ]}>
+        <View style={styles.dragBar} ref={dragBarRef} />
+        <Pressable
+          style={styles.bottomSheetContentsContainer}
+          onPressOut={() => {
+            getDragBarY();
+            dragBarY < 450
+              ? setCalendarMatrixHeight(0)
+              : setCalendarMatrixHeight(270);
+        }}>
+          <Text>
+            BottomSheet
+          </Text>
+        </Pressable>
+      </Animated.View>
+    </GestureDetector>
   );
 }
 
-function WeekMatrix({ pressedButton, targetWeek }) {
+function WeekMatrix({ pressedButton, setPressedButton, targetWeek, thisMonth }) {
   return (
     <View style={styles.oneWeekContainer}>
       {targetWeek?.map((day, dayIndex) => (
@@ -27,7 +84,11 @@ function WeekMatrix({ pressedButton, targetWeek }) {
           }}
           key={dayIndex}
         >
-          <Text  style={styles.dayText}>
+          <Text
+            style={day.getMonth() === thisMonth
+              ? styles.dayText
+              : styles.otherMonthText}
+          >
             {day.getDate()}
           </Text>
         </Pressable>
@@ -36,9 +97,32 @@ function WeekMatrix({ pressedButton, targetWeek }) {
   );
 }
 
-function CalendarMatrix({ pressedButton, setPressedButton, setTargetWeek, dayilyMatrix }) {
+function CalendarMatrix({
+  pressedButton,
+  setPressedButton,
+  setTargetWeek,
+  calendarMatrixHeight,
+  setCalendarMatrixHeight,
+  dayilyMatrix,
+  thisMonth
+}) {
+  const animation = useSharedValue({ height: 270 });
+  const animationStyle = useAnimatedStyle(() => {
+    return {
+      height: withTiming(calendarMatrixHeight, {
+        duration: 500,
+      }),
+    };
+  });
+
+  useEffect(() => {
+    setCalendarMatrixHeight(animation.value.height);
+  }, [animation]);
+
   return (
-    <View style={styles.calendarMatrixContainer}>
+    <Animated.View
+      style={[styles.calendarMatrixContainer, animationStyle]}
+    >
       {dayilyMatrix.map((weekList, weekIndex) => (
         <View style={styles.weekContainer} key={weekIndex}>
           {weekList.map((day, dayIndex) => (
@@ -52,14 +136,17 @@ function CalendarMatrix({ pressedButton, setPressedButton, setTargetWeek, dayily
               }}
               key={dayIndex}
             >
-              <Text style={styles.dayText}>
+              <Text style={day.getMonth() === thisMonth
+                ? styles.dayText
+                : styles.otherMonthText}
+              >
                 {day.getDate()}
               </Text>
             </Pressable>
           ))}
         </View>
       ))}
-    </View>
+    </Animated.View>
   );
 }
 
@@ -67,14 +154,17 @@ function Calendar() {
   const [month, setMonth] = useState(() => new Date().getMonth());
   const [pressedButton, setPressedButton] = useState("");
   const [targetWeek, setTargetWeek] = useState([]);
+  const [dragBarY, setDragBarY] = useState(500);
+  const [calendarMatrixHeight, setCalendarMatrixHeight] = useState(0);
 
   const dayWeekArray = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const today = new Date();
-  const monthString = new Date(today.getFullYear(), month, today.getDate()).toLocaleString("en-US", { month: "long" });
+  const thisMonth = new Date(today.getFullYear(), month).getMonth();
+  const monthString = new Date(today.getFullYear(), month).toLocaleString("en-US", { month: "long" });
   const year = new Date(today.getFullYear(), month, today.getDate()).getFullYear();
-
   const firstDayWeekIndex = new Date(today.getFullYear(), month, 1).getDay();
   let dateCount = 0 - firstDayWeekIndex;
+
   const dayilyMatrix = new Array(6).fill([]).map(() => {
     return new Array(7).fill(0).map(() => {
       dateCount++;
@@ -83,61 +173,79 @@ function Calendar() {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.titleContainer}>
-        <Icon.Button
-          name="angle-left"
-          color="#35C0F5"
-          size={40}
-          backgroundColor="#00000000"
-          onPress={() => setMonth(month - 1)}
-        />
-        <Text style={styles.monthYearText}>
-          {monthString} {year}
-        </Text>
-        <Icon.Button
-          name="angle-right"
-          color="#35C0F5"
-          size={40}
-          backgroundColor="#00000000"
-          onPress={() => setMonth(month + 1)}
+    <GestureHandlerRootView style={styles.gestureContainer}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.titleContainer}>
+          <Icon.Button
+            name="angle-left"
+            color="#35C0F5"
+            size={40}
+            backgroundColor="#00000000"
+            onPress={() => setMonth(month - 1)}
           />
-      </View>
-      <View style={styles.dayWeekContainer}>
-        {dayWeekArray.map((dayWeek, dayWeekIndex) => (
-          <Text style={styles.dayWeekText} key={dayWeekIndex}>
-            {dayWeek}
+          <Text style={styles.monthYearText}>
+            {monthString} {year}
           </Text>
-        ))}
-      </View>
-      <CalendarMatrix
-        pressedButton={pressedButton}
-        setPressedButton={setPressedButton}
-        targetWeek={targetWeek}
-        setTargetWeek={setTargetWeek}
-        dayilyMatrix={dayilyMatrix}
-      />
-      <WeekMatrix
-        pressedButton={pressedButton}
-        targetWeek={targetWeek}
-      />
-      <BottomSheet />
-    </SafeAreaView>
+          <Icon.Button
+            name="angle-right"
+            color="#35C0F5"
+            size={40}
+            backgroundColor="#00000000"
+            onPress={() => setMonth(month + 1)}
+          />
+        </View>
+        <View style={styles.dayWeekContainer}>
+          {dayWeekArray.map((dayWeek, dayWeekIndex) => (
+            <Text style={styles.dayWeekText} key={dayWeekIndex}>
+              {dayWeek}
+            </Text>
+          ))}
+        </View>
+        {dragBarY > 450
+          ? <CalendarMatrix
+              pressedButton={pressedButton}
+              setPressedButton={setPressedButton}
+              setTargetWeek={setTargetWeek}
+              calendarMatrixHeight={calendarMatrixHeight}
+              setCalendarMatrixHeight={setCalendarMatrixHeight}
+              dayilyMatrix={dayilyMatrix}
+              thisMonth={thisMonth}
+            />
+          : <WeekMatrix
+              pressedButton={pressedButton}
+              setPressedButton={setPressedButton}
+              targetWeek={targetWeek}
+              thisMonth={thisMonth}
+            />
+        }
+        <BottomSheet
+          dragBarY={dragBarY}
+          setDragBarY={setDragBarY}
+          setCalendarMatrixHeight={setCalendarMatrixHeight}
+        />
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  gestureContainer: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+  },
   container: {
     flex: 1,
-    alignItems: "center",
+    width: "100%",
+    height: "100%",
   },
   titleContainer: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "space-around",
     alignItems: "center",
     marginVertical: 5,
   },
   dayWeekContainer: {
+    justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
     marginVertical: 15,
@@ -147,9 +255,10 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: "center",
   },
+
   calendarMatrixContainer:{
     width: "100%",
-    backgroundColor: "yellow",
+    backgroundColor: "#D3D3D3",
   },
   oneWeekContainer: {
     flexDirection: "row",
@@ -175,9 +284,23 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 15,
     textAlign: "center",
+    color: "black",
   },
+  otherMonthText: {
+    fontSize: 15,
+    textAlign: "center",
+    color: "grey",
+  },
+
   bottomSheetContainer: {
+    position: "absolute",
     width: "100%",
+    height: WINDOW_HEIGHT,
+    bottom: (WINDOW_HEIGHT * 0.2) - WINDOW_HEIGHT,
+  },
+  bottomSheetContentsContainer: {
+    width: "100%",
+    height: "100%",
   },
   dragBar: {
     marginTop: 5,
