@@ -45,14 +45,14 @@ const styles = StyleSheet.create({
     width: DAY_SIZE.WIDTH,
   },
   dayText: {
+    color: COLORS.BLACK,
     fontSize: FONT_SIZE.MIDDLE,
     textAlign: "center",
-    color: COLORS.BLACK,
   },
   otherMonthText: {
+    color: COLORS.GREY,
     fontSize: FONT_SIZE.MIDDLE,
     textAlign: "center",
-    color: COLORS.GREY,
   },
 });
 

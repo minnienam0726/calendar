@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { COLORS, COORDINATES, DAY_SIZE, FONT_SIZE } from "../config/constatns";
+import { COORDINATES, COLORS, FONT_SIZE, DAY_SIZE } from "../config/constatns";
 
 function CalendarMatrix({
   pressedButton,
@@ -78,14 +78,14 @@ const styles = StyleSheet.create({
     width: DAY_SIZE.WIDTH,
   },
   dayText: {
+    color: COLORS.BLACK,
     fontSize: FONT_SIZE.MIDDLE,
     textAlign: "center",
-    color: COLORS.BLACK,
   },
   otherMonthText: {
+    color: COLORS.GREY,
     fontSize: FONT_SIZE.MIDDLE,
     textAlign: "center",
-    color: COLORS.GREY,
   },
 });
 

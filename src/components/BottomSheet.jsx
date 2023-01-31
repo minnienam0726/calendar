@@ -15,18 +15,18 @@ function BottomSheet({ dragBarY, setDragBarY, setCalendarMatrixHeight }) {
         offset.value = {
           x: event.translationX + start.value.x,
           y: event.translationY + start.value.y,
-        }
+        };
       } else {
         offset.value = {
           y: COORDINATES.END_POSITION_Y,
-        }
+        };
       }
     })
     .onEnd(() => {
       start.value = {
         x: offset.value.x,
         y: offset.value.y,
-      }
+      };
     });
 
   function getDragBarY() {
@@ -70,18 +70,18 @@ function BottomSheet({ dragBarY, setDragBarY, setCalendarMatrixHeight }) {
 const styles = StyleSheet.create({
   bottomSheetContainer: {
     position: "absolute",
+    bottom: (WINDOWS.HEIGHT * 0.2) - WINDOWS.HEIGHT,
     width: "100%",
     height: WINDOWS.HEIGHT,
-    bottom: (WINDOWS.HEIGHT * 0.2) - WINDOWS.HEIGHT,
   },
   bottomSheetContentsContainer: {
     width: "100%",
     height: "100%",
   },
   dragBar: {
-    marginTop: 5,
     width: "100%",
     height: 2,
+    marginTop: 5,
     backgroundColor: COLORS.BLACK,
   },
 });

@@ -8,7 +8,7 @@ import CalendarMatrix from "../components/CalendarMatrix";
 import WeekMatrix from "../components/WeekMatrix";
 import BottomSheet from "../components/BottomSheet";
 
-import { COLORS, COORDINATES, DAY_SIZE, FONT_SIZE } from "../config/constatns";
+import { COORDINATES, COLORS, FONT_SIZE, DAY_SIZE  } from "../config/constatns";
 
 function Calendar() {
   const [month, setMonth] = useState(() => new Date().getMonth());
@@ -103,6 +103,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     marginVertical: 5,
+  },
+  monthYearText: {
+    fontSize: FONT_SIZE.MIDDLE,
   },
   dayWeekContainer: {
     flexDirection: "row",
