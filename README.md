@@ -1,5 +1,12 @@
 # Calendar
 
+<p align="center">
+<img src="https://user-images.githubusercontent.com/110805557/215775661-9146e199-0dff-4096-9b93-6c67b2927bdb.jpg" height="410px" width="200px">
+<img src="https://user-images.githubusercontent.com/110805557/215775682-8f26adb1-d637-492b-b3d3-8352168529af.jpg" height="410px" width="200px">
+<img src="https://user-images.githubusercontent.com/110805557/215775696-a608711a-87f6-4cab-9a9a-852614a1cebc.jpg" height="410px" width="200px">
+<img src="https://user-images.githubusercontent.com/110805557/215775721-d827c2cc-7b5a-4508-92a6-605b57b47136.jpg" height="410px" width="200px">
+</p>
+
 ## 목차
 
 - [설치 방법](#설치-방법)
@@ -67,7 +74,7 @@
   - 현재 특정 날짜를 누르지 않은 채로 bottomSheet를 올리면, 주간 달력이 표기되지 않습니다.
     시간 관계상 현재 날짜를 기준으로 금주를 표시하지 못한 부분이 아쉽습니다.
 
-### 느낀 
+### 느낀 부분
   - 여러 제스처 중 어떤 제스처를 택해야 사용자들 이용에 불편함이 없게 모바일 앱을 사용할 수 있을지 UX를 고려할 수 있었습니다.
     개인 프로젝트 때는 버튼 하나에 의존한 이벤트를 활용하여, 모바일 앱의 묘미를 제대로 즐기지 못했습니다.
     이번 과제를 통해서 여러 제스처를 고민하여 사용하는 재미가 있었습니다.
