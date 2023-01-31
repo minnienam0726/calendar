@@ -1,4 +1,3 @@
-import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 function MyPage() {
@@ -9,8 +8,6 @@ function MyPage() {
   );
 }
 
-export default MyPage;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -18,3 +15,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+
+export default MyPage;
